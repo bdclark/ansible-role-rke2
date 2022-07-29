@@ -1,0 +1,36 @@
+---
+
+- name: Verify
+  hosts: node3
+  gather_facts: false
+  vars:
+    rke2_data_path: /var/lib/rancher/rke2
+  tasks:
+    - name: Verify RKE2
+      shell: |
+        set -e
+        set -o pipefail
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes | grep " Ready" | wc -l
+      args:
+        executable: /bin/bash
+      register: nodes
+
+    - name: Check Nodes
+      assert:
+        that:
+          - groups.all | length == nodes.stdout | int
+        quiet: true
+
+    - name: Verify kube-vip-cloud-provider
+      shell: |
+        set -eo pipefail
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml -n kube-system get statefulset kube-vip-cloud-provider
+      args:
+        executable: /bin/bash
+      register: statefulset
+
+    - debug:
+        var: statefulset
+
+    - assert:
+        that: "{{ '1/1' in statefulset.stdout_lines | last }}"
