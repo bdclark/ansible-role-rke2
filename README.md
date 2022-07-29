@@ -39,7 +39,6 @@ This is a copy of `defaults/main.yml`
 
 ```yaml
 ---
-
 # Default nodetaints
 node_taints: []
 
@@ -57,22 +56,33 @@ rke2_ha_mode_keepalived: true
 # rke2_ha_mode_keepalived needs to be false
 rke2_ha_mode_kubevip: false
 
+# Template paths for kube-vip LB and VIP manifest files
+rke2_ha_mode_kubevip_manifest_fileglob:
+  - templates/kube-vip/kube-vip.yml.j2
+  - templates/kube-vip/kube-vip-rbac.yml.j2
+
 # Kubernetes API and RKE2 registration IP address. The default Address is the IPv4 of the Server/Master node.
-# In HA mode choose a static IP which will be set as VIP in keepalived.
-# Or if the keepalived is disabled, use IP address of your LB.
+# In HA mode choose a static IP which will be set as VIP in keepalived or kube-vip
+# Or if the keepalived and kube-vip is disabled, use IP address of your LB.
 rke2_api_ip: "{{ hostvars[groups[rke2_servers_group_name].0]['ansible_default_ipv4']['address'] }}"
 
-# optional option for kubevip IP subnet
+# Optional kube-vip IP subnet
 # rke2_api_cidr: 24
 
-# optional option for kubevip
+# Optional kube-vip ethernet interface
 # rke2_interface: eth0
 
-# optiononal option for kubevip load balancer IP range
+# kube-vip-cloud-provider load balancer IP range
+# Required if kube-vip-cloud-provider is enabled and using default manifest templates
 # rke2_loadbalancer_ip_range: 192.168.1.50-192.168.1.100
 
-# Install kubevip cloud provider if rke2_ha_mode_kubevip is true
+# Install kube-vip-cloud-provider if rke2_ha_mode_kubevip is true
 rke2_kubevip_cloud_provider_enable: true
+
+# Template paths for kube-vip-cloud-provider manifest files
+# Only used if rke2_kubevip_cloud_provider_enable is true
+rke2_kubevip_cloud_provider_manifest_fileglob:
+  - templates/kube-vip/kube-vip-cloud-*.j2
 
 # Enable kube-vip to watch Services of type LoadBalancer
 rke2_kubevip_svc_enable: true

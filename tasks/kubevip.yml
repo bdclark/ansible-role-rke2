@@ -6,9 +6,7 @@
     owner: root
     group: root
     mode: 0664
-  with_fileglob:
-    - "templates/kube-vip/kube-vip.yml.j2"
-    - "templates/kube-vip/kube-vip-rbac.yml.j2"
+  with_fileglob: "{{ rke2_ha_mode_kubevip_manifest_fileglob }}"
 
 - name: Copy kube-vip load balancer manifests to first server
   ansible.builtin.template:
@@ -17,7 +15,6 @@
     owner: root
     group: root
     mode: 0664
-  with_fileglob:
-    - "templates/kube-vip/kube-vip-cloud-*.j2"
+  with_fileglob: "{{ rke2_kubevip_cloud_provider_manifest_fileglob }}"
   when:
     - rke2_kubevip_cloud_provider_enable | bool
